@@ -44,8 +44,8 @@ jobs:
           file: ./dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/restro-application:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/restro-application:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/Restro:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/Restro:${{ github.sha }}
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
