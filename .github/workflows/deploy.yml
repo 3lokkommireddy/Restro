@@ -44,8 +44,8 @@ jobs:
           file: ./dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/Restro:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/Restro:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/projectloki:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/projectloki:${{ github.sha }}
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -56,7 +56,8 @@ jobs:
 
       - name: Download Amazon ECS task definition
         run: | 
-         aws ecs describe-task-definition --task-definition restro-task --query taskDefinition > task-definition.json
+         aws ecs describe-task-definition --task-definition 
+         -task --query taskDefinition > task-definition.json
          cat task-definition.json
 
       - name: Replace Docker image ID and create new Task definition
