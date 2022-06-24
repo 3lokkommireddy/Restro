@@ -7,9 +7,9 @@ on:
 
 env:
  AWS_REGION: us-east-1
- ECS_SERVICE: app-service
- ECS_CLUSTER: restro
- CONTAINER_NAME: restro-app
+ ECS_SERVICE: project-service
+ ECS_CLUSTER: project-cluster
+ CONTAINER_NAME: project-container
 
 jobs:
   app_pipeline:
@@ -44,8 +44,8 @@ jobs:
           file: ./dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/projectloki:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/projectloki:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/project:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/project:${{ github.sha }}
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -56,7 +56,7 @@ jobs:
 
       - name: Download Amazon ECS task definition
         run: | 
-         aws ecs describe-task-definition --task-definition restro-task --query taskDefinition > task-definition.json
+         aws ecs describe-task-definition --task-definition project-task --query taskDefinition > task-definition.json
          cat task-definition.json
 
       - name: Replace Docker image ID and create new Task definition
@@ -65,7 +65,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ secrets.DOCKERHUB_USERNAME }}/restro-application:latest
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/project:latest
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -75,13 +75,13 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-            #                  - name: Slack Notification
-            # uses: 8398a7/action-slack@v3
-            #with:
-            #status: ${{ job.status }}
-            # text: "The CI/CD Pipeline for Restro project executed successfully"
-            # fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
-            #channel: "ci-cd_pipeline"
-            # env:
-            # SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-            # if: always() # Pick up events even if the job fails or is canceled.
+    #  - name: Slack Notification
+    #   uses: 8398a7/action-slack@v3
+    #   with:
+    #     status: ${{ job.status }}
+    #     text: "The CI/CD Pipeline for Restro project executed successfully"
+    #     fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+    #     channel: "ci-cd_pipeline"
+    #   env:
+    #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+    #   if: always() # Pick up events even if the job fails or is canceled.
